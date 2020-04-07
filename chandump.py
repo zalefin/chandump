@@ -18,7 +18,8 @@ def run():
     soup = bs4.BeautifulSoup(r.content)
     thumbs = soup.findAll('a', {'class': 'fileThumb'})
     for thumb in thumbs:
-        link = 'https:' + thumb.find('img')['src']
+        link = 'https:' + thumb['href']
+        #link = 'https:' + thumb.find('img')['src']
         fname = getfname(link)
         print('Downloading', fname)
         urllib.request.urlretrieve(link, fname)
