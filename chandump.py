@@ -2,6 +2,7 @@
 from sys import argv
 import re
 import urllib.request
+from threading import Thread
 
 import requests
 import bs4
@@ -14,6 +15,7 @@ def getfname(link):
 
 
 def run():
+    threads = []
     r = requests.get(argv[1])
     soup = bs4.BeautifulSoup(r.content)
     thumbs = soup.findAll('a', {'class': 'fileThumb'})
@@ -21,8 +23,14 @@ def run():
         link = 'https:' + thumb['href']
         #link = 'https:' + thumb.find('img')['src']
         fname = getfname(link)
+        dl_f = lambda: urllib.request.urlretrieve(link, fname)
         print('Downloading', fname)
-        urllib.request.urlretrieve(link, fname)
+        thread = Thread(target=dl_f)
+        thread.start()
+        threads.append(thread)
+
+    for t in threads:
+        t.join()
 
     print('Done!')
 
